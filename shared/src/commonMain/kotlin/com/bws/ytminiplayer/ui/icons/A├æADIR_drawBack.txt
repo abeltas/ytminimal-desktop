@@ -1,0 +1,12 @@
+AÑADE ESTA FUNCION A TU PlayerIcons.kt (junto a los demas iconos)
+==================================================================
+
+/* Flecha atras (para cerrar el popup de biblioteca). */
+internal fun DrawScope.drawBack(c: Color) {
+    val w = size.width; val h = size.height; val s = 1.9f
+    // Linea horizontal
+    drawLine(c, Offset(w * 0.22f, h * 0.5f), Offset(w * 0.82f, h * 0.5f), s, StrokeCap.Round)
+    // Punta de flecha a la izquierda
+    drawLine(c, Offset(w * 0.22f, h * 0.5f), Offset(w * 0.42f, h * 0.32f), s, StrokeCap.Round)
+    drawLine(c, Offset(w * 0.22f, h * 0.5f), Offset(w * 0.42f, h * 0.68f), s, StrokeCap.Round)
+}
