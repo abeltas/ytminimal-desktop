@@ -107,6 +107,59 @@ object YouTubeAudioDownloader {
     }
 
     /**
+     * Fuerza la generación / actualización del archivo de cookies.
+     *
+     * yt-dlp lee y reescribe el archivo indicado en --cookies, así que ejecutar
+     * una petición con --cookies crea (si no existe) o renueva el cookie jar.
+     *
+     * Equivale a:
+     *   ./yt-dlp --cookies "<cookies>" "<url>" > logs/log_cookies_<ts>.txt 2>&1
+     *
+     * @return true si yt-dlp terminó bien y el archivo de cookies quedó escrito.
+     */
+    suspend fun regenerateCookies(
+        videoUrl: String = "https://www.youtube.com/watch?v=7r_ArIC1Hhc"
+    ): Boolean = withContext(Dispatchers.IO) {
+
+        val cookiesFile = File(AppPaths.baseDir(), "yt_cookies.txt")
+
+        // --- Log ---
+        val logsDir = AppPaths.dir("log")
+        val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
+        val logFile = File(logsDir, "log_cookies_$timestamp.txt")
+
+        println("Regenerando cookies -> ${cookiesFile.absolutePath}")
+        println(logFile.absolutePath)
+
+        val process = ProcessBuilder(
+            ytDlpPath,
+            "--cookies", cookiesFile.absolutePath,
+            // deno es necesario para resolver el reto JS de YouTube (igual que en downloadAudio).
+            // Si prefieres el comando "puro" que pasaste, puedes quitar esta línea.
+            "--js-runtimes", "deno:$denoPath",
+            videoUrl
+        ).apply {
+            redirectErrorStream(true)   // junta stdout + stderr  (equivale a 2>&1)
+        }.start()
+
+        // Volcamos toda la salida al log (equivale a  > logs/log_cookies_*.txt)
+        logFile.bufferedWriter().use { logWriter ->
+            process.inputStream.bufferedReader().use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    logWriter.write(line ?: "")
+                    logWriter.newLine()
+                }
+            }
+        }
+
+        val exitCode = process.waitFor()
+        println("regenerateCookies exitCode = $exitCode")
+
+        exitCode == 0 && cookiesFile.exists() && cookiesFile.length() > 0L
+    }
+
+    /**
      * Reescribe los tags ID3 (title/artist) del mp3 usando exactamente
      * los valores de YtVideo, sin depender de lo que YouTube haya etiquetado.
      * Usa ffmpeg -codec copy sobre un archivo temporal y luego reemplaza el original.

@@ -60,6 +60,7 @@ import com.bws.ytminiplayer.helper.YouTubeAudioDownloader
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import com.bws.ytminiplayer.helper.NotificationHelper
+import com.bws.ytminiplayer.helper.AppPaths
 import kotlinx.coroutines.delay
 import java.io.File
 
@@ -73,6 +74,8 @@ internal fun SearchView(
     var loading by remember { mutableStateOf(false) }
     var results by remember { mutableStateOf<List<YtVideo>>(emptyList()) }
     var searched by remember { mutableStateOf(false) }
+    // true mientras yt-dlp está generando/renovando las cookies. Bloquea las descargas.
+    var regeneratingCookies by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
 
@@ -80,6 +83,37 @@ internal fun SearchView(
     LaunchedEffect(Unit) {
         delay(500)
         focusRequester.requestFocus()
+    }
+
+    // Al entrar a la vista: si no existe el archivo de cookies, intentar generarlo.
+    // Debe coincidir con el que usa YouTubeAudioDownloader al descargar.
+    LaunchedEffect(Unit) {
+        val cookiesFile = File(AppPaths.baseDir(), "yt_cookies.txt")
+        if (!cookiesFile.exists() || cookiesFile.length() == 0L) {
+            NotificationHelper.warning(
+                "Cookies no encontradas",
+                "Generando nuevas cookies, espera un momento..."
+            )
+            regeneratingCookies = true
+            val ok = try {
+                YouTubeAudioDownloader.regenerateCookies()
+            } catch (e: Exception) {
+                println("regenerateCookies falló: ${e.message}")
+                false
+            }
+            regeneratingCookies = false
+            if (ok) {
+                NotificationHelper.success(
+                    "Cookies listas",
+                    "Se generaron nuevas cookies correctamente."
+                )
+            } else {
+                NotificationHelper.error(
+                    "Error con las cookies",
+                    "No se pudieron generar las cookies. Las descargas podrían fallar."
+                )
+            }
+        }
     }
 
     fun sync() {
@@ -187,14 +221,15 @@ internal fun SearchView(
                         SearchRow(
                             roboto = roboto,
                             video = item,
+                            downloadsBlocked = regeneratingCookies,
                             onDownloadRequest = { video ->
                                 try {
-                                     val complete = YouTubeAudioDownloader.downloadAudio(
+                                    val complete = YouTubeAudioDownloader.downloadAudio(
                                         video,
                                         onProgress = { progress, status ->
                                             println("Descargando => $progress, $status")
                                         }
-                                     )
+                                    )
                                     complete
                                 } catch (e: Exception) {
                                     println("Descarga fallida: ${e.message}")
@@ -221,6 +256,7 @@ internal fun SearchView(
 private fun SearchRow(
     roboto: FontFamily,
     video: YtVideo,
+    downloadsBlocked: Boolean,                        // true mientras se regeneran las cookies
     onDownloadRequest: suspend (YtVideo) -> Boolean,  // devuelve true si ok, false si error
     onDownloaded: (String) -> Unit                    // avisa al padre para quitarlo de la lista
 ) {
@@ -251,7 +287,7 @@ private fun SearchRow(
                 .size(38.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(PlayerColors.ControlCircle)
-                .clickable(enabled = !downloading) {
+                .clickable(enabled = !downloading && !downloadsBlocked) {
                     downloading = true
                     scope.launch {
                         println("Downloading start ${video.videoId}")
@@ -298,7 +334,8 @@ private fun SearchRow(
                     strokeWidth = 2.dp
                 )
             } else {
-                Canvas(Modifier.size(16.dp)) { drawDownload(Color.White) }
+                val iconColor = if (downloadsBlocked) Color.White.copy(alpha = 0.35f) else Color.White
+                Canvas(Modifier.size(16.dp)) { drawDownload(iconColor) }
             }
         }
 
