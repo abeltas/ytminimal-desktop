@@ -47,9 +47,13 @@ object YouTubeAudioDownloader {
         //kotlinx.coroutines.delay(5000)
         //println(outputTemplate)
 
+        val cookiesFile = File(AppPaths.baseDir(), "yt_cookies.txt")
+        //val useCookies = cookiesFile.exists() && cookiesFile.length() > 0L
+
         val process = ProcessBuilder(
             ytDlpPath,
             "-v",
+            "--cookies", cookiesFile.absolutePath,
             "--js-runtimes", "deno:$denoPath",
             "--ffmpeg-location", ffmpegPath,
             "-x",
