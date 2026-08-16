@@ -2,6 +2,7 @@ package com.bws.ytminiplayer.data
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
+import com.bws.ytminiplayer.helper.AppPaths
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Image as SkiaImage
@@ -43,7 +44,7 @@ object ThumbCache {
     suspend fun getThumbnail(videoId: String, url: String): ImageBitmap? =
         withContext(Dispatchers.IO) {
             if (videoId.isBlank()) return@withContext null
-            val folder = resolveFolder()
+            val folder = AppPaths.dir("img/thumb")
             val file = File(folder, "$videoId.jpg")
 
             // 1. Existe en disco -> cargar directo

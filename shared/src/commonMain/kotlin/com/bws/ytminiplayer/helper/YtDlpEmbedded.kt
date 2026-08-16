@@ -31,16 +31,20 @@ object EmbeddedBinaries {
         val osName = System.getProperty("os.name").lowercase()
         val binaryName = if (osName.contains("win")) windowsName else unixName
 
-        val workingDir = File(System.getProperty("user.dir"))
-        var binaryDir = File(workingDir.absolutePath, "src/resources/bin")
+        // En vez de user.dir (rompe el arranque empaquetado), usamos la carpeta de
+        // recursos que Compose Desktop expone automáticamente, tanto en `run` como
+        // en `runDistributable`/instalador final.
+        val resourcesDir = System.getProperty("compose.application.resources.dir")
+            ?: File(System.getProperty("user.dir"), "src/resources").absolutePath
 
-        // Construir ruta completa
+        val binaryDir = AppPaths.dir("bin")
+
         val binaryFile = File(binaryDir, binaryName)
 
         if (!binaryFile.exists()) {
             throw IllegalStateException(
                 "Binario no encontrado: ${binaryFile.absolutePath}\n" +
-                        "Verifica que exista en: $workingDir"
+                        "Verifica que exista en: $binaryDir"
             )
         }
         // Verificar que sea ejecutable

@@ -39,7 +39,7 @@ compose.desktop {
         mainClass = "com.bws.ytminiplayer.MainKt"
         //jvmArgs("-Duser.dir=F:\\Develop\\KotlinMultiPlatform\\KotlinYTMiniPlayer")
 
-        jvmArgs += "-Duser.dir=${rootProject.projectDir}"
+        //jvmArgs += "-Duser.dir=${rootProject.projectDir}"
 
         nativeDistributions {
             windows{
@@ -49,8 +49,8 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "com.bws.ytminiplayer"
             packageVersion = "1.0.1"
-            //appResourcesRootDir.set(project.layout.projectDirectory.dir("src/resources/bin"))
-            appResourcesRootDir.set(project.layout.projectDirectory.dir("src/resources/bin"))
+            appResourcesRootDir.set(project.layout.projectDirectory.dir("src/resources"))
+
         }
     }
 }

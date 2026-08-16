@@ -34,10 +34,10 @@ object YouTubeAudioDownloader {
             "\"${outputPath.absolutePath}/%(title)s.%(ext)s\""
         }
 
-        val workingDir = File(System.getProperty("user.dir"))
-
         // --- Log ---
-        val logsDir = File(workingDir, "src/resources/log").apply { mkdirs() }
+        val resourcesDir = System.getProperty("compose.application.resources.dir")
+            ?: File(System.getProperty("user.dir"), "src/resources").absolutePath
+        val logsDir = File(resourcesDir, "log").apply { mkdirs() }
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
         val logFile = File(logsDir, "log_$timestamp.txt")
 
@@ -145,10 +145,9 @@ object YouTubeAudioDownloader {
     // --- Métodos privados ---
 
     private fun getDefaultOutputDir(): String {
-        val workingDir = File(System.getProperty("user.dir"))
-        val downloadDir = File(workingDir.absolutePath, "src/resources/mp3/download")
-
-        return downloadDir.absolutePath
+        val resourcesDir = System.getProperty("compose.application.resources.dir")
+            ?: File(System.getProperty("user.dir"), "src/resources").absolutePath
+        return File(resourcesDir, "mp3/download").absolutePath
     }
 
     private fun findMp3File(outputPath: File, fileName: String?): File? {

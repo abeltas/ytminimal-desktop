@@ -1,5 +1,6 @@
 package com.bws.ytminiplayer.audio
 
+import com.bws.ytminiplayer.helper.AppPaths
 import java.io.File
 
 /**
@@ -16,7 +17,7 @@ import java.io.File
 object MusicFolder {
 
     fun resolve(): File {
-        val base = resolveBase()
+        val base = AppPaths.dir("mp3")
 
         // Subcarpeta download dentro de la base.
         val download = File(base, "download")

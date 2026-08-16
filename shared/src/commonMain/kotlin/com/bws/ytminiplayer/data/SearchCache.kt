@@ -1,5 +1,6 @@
 package com.bws.ytminiplayer.data
 
+import com.bws.ytminiplayer.helper.AppPaths
 import java.io.File
 import java.util.Base64
 
@@ -28,7 +29,8 @@ object SearchCache {
         val normalized = query.trim().lowercase()
         val encoded = Base64.getUrlEncoder().withoutPadding()
             .encodeToString(normalized.toByteArray(Charsets.UTF_8))
-        return File(resolveFolder(), "$encoded.json")
+        val folder = AppPaths.dir("cache/search")
+        return File(folder, "$encoded.json")
     }
 
     /** Devuelve el JSON crudo cacheado para esa query, o null si no existe. */
