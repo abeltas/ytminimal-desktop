@@ -52,8 +52,6 @@ object MusicFolder {
             ?.isNotEmpty() == true
 
     // En MusicFolder.kt (o donde prefieras)
-    fun existsMp3(videoId: String): Boolean {
-        val folder = resolve()   // tu carpeta de mp3 (o la subcarpeta download)
-        return File(folder, "download/$videoId.mp3").exists()
-    }
+    fun existsMp3(videoId: String): Boolean =
+        File(AppPaths.dir("mp3/download"), "$videoId.mp3").exists()
 }
