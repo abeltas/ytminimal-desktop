@@ -44,11 +44,12 @@ compose.desktop {
         nativeDistributions {
             windows{
                 includeAllModules = true
+                iconFile.set(project.file("src/resources/app_icon.ico"))
             }
             //includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
-            packageName = "com.bws.ytminiplayer"
-            packageVersion = "1.0.1"
+            packageName = "YTMiniPlayer"
+            packageVersion = "1.0.5"
             appResourcesRootDir.set(project.layout.projectDirectory.dir("src/resources"))
 
         }
