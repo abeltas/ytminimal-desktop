@@ -34,8 +34,6 @@ object EmbeddedBinaries {
         // En vez de user.dir (rompe el arranque empaquetado), usamos la carpeta de
         // recursos que Compose Desktop expone automáticamente, tanto en `run` como
         // en `runDistributable`/instalador final.
-        val resourcesDir = System.getProperty("compose.application.resources.dir")
-            ?: File(System.getProperty("user.dir"), "src/resources").absolutePath
 
         val binaryDir = AppPaths.dir("bin")
 

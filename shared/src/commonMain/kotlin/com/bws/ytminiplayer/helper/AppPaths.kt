@@ -9,7 +9,7 @@ object AppPaths {
         // Compilado: Compose expone la ruta real
         System.getProperty("compose.application.resources.dir")?.let { return File(it) }
         // Desarrollo: árbol de fuentes
-        return File(System.getProperty("user.dir"), "desktopApp/src/resources")
+        return File(System.getProperty("user.dir"), "src/resources/common")
     }
 
     /** Devuelve una subcarpeta y la crea si no existe. */

@@ -29,9 +29,9 @@ object YouTubeAudioDownloader {
         val outputPath = File(outputDir).apply { mkdirs() }
 
         val outputTemplate = if (video.videoId.isNotEmpty()) {
-            "\"${outputPath.absolutePath}/${video.videoId}.%(ext)s\""
+            "\"${outputPath.absolutePath}\\${video.videoId}.%(ext)s\""
         } else {
-            "\"${outputPath.absolutePath}/%(title)s.%(ext)s\""
+            "\"${outputPath.absolutePath}\\%(title)s.%(ext)s\""
         }
 
         // --- Log ---
